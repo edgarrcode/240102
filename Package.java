@@ -7,13 +7,23 @@ public class Package {
   //constructors
   public Package () {
   }
-  public Package (double width , double height, double length) {
-    width = width;
-    height = height;
-    length = length;
+  public Package (double newWidth , double newHeight, double newLength) {
+    width = newWidth;
+    height = newHeight;
+    length = newLength;
   }
   
   //accessors
+  public double getWidth() {
+    return width;
+  }
+  public double getHeight() {
+    return height;
+  }
+  public double getLength() {
+    return length;
+  }
+
   public double getVolume(){
     return (width * height * length);
   }
