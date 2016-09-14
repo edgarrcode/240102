@@ -29,11 +29,34 @@ public class Runner {
     String[] eachLineStringArray;
     for (int i = 0; i < numOfLines; i++) {
       eachLineStringArray = buffer.readLine().split(" ");
-      packageArray[i] = new Package (Double.parseDouble(eachLineStringArray[0]), Double.parseDouble(eachLineStringArray[1]), Double.parseDouble(eachLineStringArray[2]));
+      if (eachLineStringArray.length > 3) {
+        try {
+            throw new IOException("There should only be 3 values per line in the file.");
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }        
+      }
+      try {
+        packageArray[i] = new Package (Double.parseDouble(eachLineStringArray[0]), Double.parseDouble(eachLineStringArray[1]), Double.parseDouble(eachLineStringArray[2]));
+      } catch(NumberFormatException e) {
+        System.err.println("The file should only contain numbers of double precision and single spaces (example: \"1.0 2.3 1.3\")");
+        System.exit(1);
+      }
+      
     }
     
     return packageArray;
   }
+
+    //sum double 1d array values
+    public static double doubleArraySum (double[] d) {
+      double doubleArraySum = 0;
+      for (int i = 0; i < d.length; i++) {
+        doubleArraySum = doubleArraySum + d[i];
+      }
+      return doubleArraySum;
+    }
 
   //find the smallest package
   public static int smallestPackageIndex(Package[] packageArray) {
@@ -74,20 +97,63 @@ public class Runner {
 
   //find the index of smallest cubic package
   public static int smallestCubicPackageIndex(Package[] packageArray) {
-    int smallestCubicPackageIndex = -1;
-    for (int i = 0; i > packageArray.length; i++) {
-      if (packageArray[i].isCube() ) {
-        double smallestCubicPackageVolume = packageArray[i].getVolume();
-        if (smallestCubicPackageVolume > packageArray[i].getVolume()) {
-          
+    int ammountOfCubicPackages = ammountOfCubicPackages(packageArray);
+    int smallestCubicPackageIndex = 0;
+    double smallestCubicPackageVolume = packageArray[0].getVolume();
+
+    if (ammountOfCubicPackages > 0) {
+      for (int i = 0; i < packageArray.length; i++) {
+        if ( (packageArray[i].isCube()) && (smallestCubicPackageVolume > packageArray[i].getVolume()) ) {
+            smallestCubicPackageIndex = i;
+            smallestCubicPackageVolume = packageArray[i].getVolume();
         }
-        smallestCubicPackageIndex = i;
-        smallestCubicPackageVolume = packageArray[i].getVolume();
       }
+    } else {
+      smallestCubicPackageIndex = -1;
     }
+
     return smallestCubicPackageIndex;
+
+  }
+
+  ////average volume of all packages
+  public static double averageVolumeOfAllPackages (Package[] packageArray) {
+    double averageVolumeOfAllPackages;
+    double[] volumesArray = new double[packageArray.length];//craete array with the length of package arrays to store volumes
+    // populate volumes array
+    for (int i = 0; i < packageArray.length; i++) {
+      volumesArray[i] = packageArray[i].getVolume();
+    }
+
+    averageVolumeOfAllPackages = doubleArraySum(volumesArray)/packageArray.length;
+
+    return averageVolumeOfAllPackages;
   }
   
+  //average volume of cubic packages
+  public static double averageVolumeOfCubicPackages (Package[] packageArray) {
+    double averageVolumeOfCubicPackages = 0;
+    int ammountOfCubicPackages = ammountOfCubicPackages(packageArray);// check if there are cubic packages
+
+    if (ammountOfCubicPackages > 0) {
+      double[] volumesArray = new double[ammountOfCubicPackages]; // create volumes array
+      int volumesArrayCounter = 0;
+      //pupulate volumes array
+      for (int i = 0; i < packageArray.length; i++) {
+        if (packageArray[i].isCube()) {
+          volumesArray[volumesArrayCounter] = packageArray[i].getVolume();
+          volumesArrayCounter++;
+        }
+      }
+      averageVolumeOfCubicPackages = doubleArraySum(volumesArray) / ammountOfCubicPackages; //sum volumes array a nddivide by ammountOfCubicPackages
+    } else {
+      averageVolumeOfCubicPackages = -1;
+    }
+
+    return averageVolumeOfCubicPackages;
+  }
+
+  /* ----------------------- main -------------------------- */
   public static void main (String[] args) throws IOException {
     // ask for file name and build packageArray
     String fileName = "";
@@ -98,16 +164,17 @@ public class Runner {
       fileName = scnr.nextLine();
       packageArray = readFile(fileName);
     }catch(FileNotFoundException e) {
-      System.err.println("File not found" + e.getMessage());
+      System.err.println("File not found " + e.getMessage());
       System.exit(1);
     }
     
     //check if file has content
     if (packageArray.length == 0) {
       try {
-        throw new IOException("File is empty!");
-      }catch(IOException e) {
+        throw new IOException("File is empty! Please use a file with data.");
+      } catch (IOException e) {
         System.out.println(e.getMessage());
+        System.exit(1);
       }
     }
 
@@ -136,13 +203,30 @@ public class Runner {
 
     //find the index of smallest cubic package
     int smallestCubicPackageIndex = smallestCubicPackageIndex(packageArray);
-    System.out.println("The index of the smallest cubic package is: " + smallestCubicPackageIndex);
-    System.out.println("The width of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getWidth());
-    System.out.println("The height of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getHeight());
-    System.out.println("The length of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getLength());
-    System.out.println("The volume of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getVolume());
+    if (smallestCubicPackageIndex > -1) {
+      System.out.println("The index of the smallest cubic package is: " + smallestCubicPackageIndex);
+      System.out.println("The width of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getWidth());
+      System.out.println("The height of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getHeight());
+      System.out.println("The length of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getLength());
+      System.out.println("The volume of the smallest cubic package is: " + packageArray[smallestCubicPackageIndex].getVolume());
+    } else {
+      System.out.println("Can't find the index of smallest cubic package because there are no cubic packages.");
+    }
     System.out.print("\n");
 
-    
+    //average volume of all packages
+    double averageVolumeOfAllPackages = averageVolumeOfAllPackages(packageArray);
+    System.out.println("Average volume of All packages: " + averageVolumeOfAllPackages);
+    System.out.print("\n");
+
+    //average volume of cubic packages
+    double averageVolumeOfCubicPackages = averageVolumeOfCubicPackages(packageArray);
+    if (averageVolumeOfCubicPackages > -1) {
+      System.out.println("Average volume of Cubic packages: " + averageVolumeOfCubicPackages);
+    } else {
+      System.out.println("Can't calculate the average volume of cubic packages because there are no cubic packages.");
+    }
+    System.out.print("\n");
+
   }
 }
