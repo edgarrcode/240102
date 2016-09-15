@@ -1,8 +1,15 @@
 /*
 Author: Edgar E. Rodriguez
-TA: Khandoker A Rahad
+TAs: Anthony M Ortiz Cepeda and Khandoker A Rahad
 Professor: Mahmud Hossain
-LMD: 8/30/16
+LMD: 09/13/16
+Goals: Read the widht, height, and length of packages from file, and calculate the following:
+• find the smallest package
+• find the largest package
+• find amount of cubic packages
+• find the index of smallest cubic package
+• average volume of all packages
+• average volume of cubic packages
 */
 
 import java.util.*;
@@ -130,8 +137,8 @@ public class Runner {
     return averageVolumeOfAllPackages;
   }
   
-  //average volume of cubic packages
-  public static double averageVolumeOfCubicPackages (Package[] packageArray) {
+  //average volume of cubic packages (divided by amount of cubic packages)
+  public static double averageVolumeOfCubicPackagesCubic (Package[] packageArray) {
     double averageVolumeOfCubicPackages = 0;
     int ammountOfCubicPackages = ammountOfCubicPackages(packageArray);// check if there are cubic packages
 
@@ -146,6 +153,29 @@ public class Runner {
         }
       }
       averageVolumeOfCubicPackages = doubleArraySum(volumesArray) / ammountOfCubicPackages; //sum volumes array a nddivide by ammountOfCubicPackages
+    } else {
+      averageVolumeOfCubicPackages = -1;
+    }
+
+    return averageVolumeOfCubicPackages;
+  }
+
+  //average volume of cubic packages (divided by amount of ALL packages)
+  public static double averageVolumeOfCubicPackagesAll (Package[] packageArray) {
+    double averageVolumeOfCubicPackages = 0;
+    int ammountOfCubicPackages = ammountOfCubicPackages(packageArray);// check if there are cubic packages
+
+    if (ammountOfCubicPackages > 0) {
+      double[] volumesArray = new double[ammountOfCubicPackages]; // create volumes array
+      int volumesArrayCounter = 0;
+      //pupulate volumes array
+      for (int i = 0; i < packageArray.length; i++) {
+        if (packageArray[i].isCube()) {
+          volumesArray[volumesArrayCounter] = packageArray[i].getVolume();
+          volumesArrayCounter++;
+        }
+      }
+      averageVolumeOfCubicPackages = doubleArraySum(volumesArray) / packageArray.length; //sum volumes array and divide by ammount Of ALL Packages
     } else {
       averageVolumeOfCubicPackages = -1;
     }
@@ -219,10 +249,19 @@ public class Runner {
     System.out.println("Average volume of All packages: " + averageVolumeOfAllPackages);
     System.out.print("\n");
 
-    //average volume of cubic packages
-    double averageVolumeOfCubicPackages = averageVolumeOfCubicPackages(packageArray);
-    if (averageVolumeOfCubicPackages > -1) {
-      System.out.println("Average volume of Cubic packages: " + averageVolumeOfCubicPackages);
+    //average volume of cubic packages (divided by amount of cubic packages)
+    double averageVolumeOfCubicPackagesCubic = averageVolumeOfCubicPackagesCubic(packageArray);
+    if (averageVolumeOfCubicPackagesCubic > -1) {
+      System.out.println("Average volume of Cubic packages (sum divided by amount of CUBIC packages only): " + averageVolumeOfCubicPackagesCubic);
+    } else {
+      System.out.println("Can't calculate the average volume of cubic packages because there are no cubic packages.");
+    }
+    System.out.print("\n");
+
+    //average volume of cubic packages (divided by amount of ALL packages)
+    double averageVolumeOfCubicPackagesAll = averageVolumeOfCubicPackagesAll(packageArray);
+    if (averageVolumeOfCubicPackagesAll > -1) {
+      System.out.println("Average volume of Cubic packages (sum divided by amount of ALL packages): " + averageVolumeOfCubicPackagesAll);
     } else {
       System.out.println("Can't calculate the average volume of cubic packages because there are no cubic packages.");
     }
